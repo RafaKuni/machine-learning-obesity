@@ -107,7 +107,6 @@ with col3:
         "5 vezes ou mais por semana"
     ], index=1)
     
-    tue = st.slider("Qual tempo diário de uso de telas/dispositivos eletrônicos (escala de 0 a 2)", 0, 2, 1)
     calc_pt = st.selectbox("Frequência de consumo de álcool?", ["Não", "Às vezes", "Frequentemente", "Sempre"])
     mtrans_pt = st.selectbox("Qual o seu meio de transporte mais utilizado?", ["Transporte Público", "Automóvel", "Caminhada", "Motocicleta", "Bicicleta"])
 
