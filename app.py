@@ -212,7 +212,7 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
             # ---------------------------------------------------------
             # MOTOR DE INSIGHTS HEURÍSTICOS
             # ---------------------------------------------------------
-            is_atleta = ((faf_pt == "5 vezes ou mais por semana" or faf_pt == "3-4 vezes por semana") and scc_pt == True and ch2o_pt == "Mais de 2 litros por dia")
+            is_atleta = ((faf_pt == "5 vezes ou mais por semana" or faf_pt == "3-4 vezes por semana" or faf_pt == "1-2 vezes por semana") and scc_pt == True and ch2o_pt == "Mais de 2 litros por dia")
             is_falso_magro = (grau == 1 and faf_pt == "Nenhuma vez" and favc_pt == True and fcvc_pt == "Raramente ou nunca")
             is_adolescente = (age < 18)
             is_idoso_sedentario = (age >= 60 and faf_pt == "Nenhuma vez")
