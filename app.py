@@ -221,7 +221,7 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
                 st.markdown("### 🔍 Insights Contextuais do Paciente")
                 
             if is_atleta and grau >= 2:
-                st.info("💪 O modelo aponta excesso de peso, mas a rotina intensa de exercícios sugere alta probabilidade de peso concentrado em massa muscular. O cálculo de IMC tradicional pode ser impreciso neste cenário. Recomenda-se exame de bioimpedância.")
+                st.info("💪 O modelo aponta excesso de peso, mas a descrição sugere alta probabilidade de peso concentrado em massa muscular. O cálculo de IMC tradicional pode ser impreciso neste cenário. Recomenda-se exame de bioimpedância.")
                 
             if is_falso_magro:
                 st.error("🕵️ Embora o peso geral esteja normal, o alto sedentarismo combinado à má alimentação indica um forte risco de acúmulo de gordura visceral e síndrome metabólica.")
@@ -231,6 +231,9 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
                 
             if is_idoso_sedentario and grau <= 2:
                 st.warning("👴 Em pacientes idosos sedentários, um IMC considerado 'normal' ou 'baixo' pode mascarar a perda severa de massa muscular substituída por tecido adiposo. Recomenda-se avaliar força e mobilidade de forma preventiva.")
+
+            else:
+                st.warning("N/A")
                 
         except Exception as e:
             st.error(f"Erro na execução preditiva: {e}")
