@@ -12,21 +12,17 @@ st.title("🏥 Sistema de Triagem Preditiva de Obesidade")
 st.markdown("Insira os dados clínicos e os hábitos do paciente para prever o nível de risco.")
 st.divider()
 
-# 2. O Segredo: Treinar o modelo na Nuvem (Executa apenas uma vez e guarda na cache)
+# 2. Treinamento do modelo acoplado na Nuvem (Garante compatibilidade total de versões)
 @st.cache_resource(show_spinner="A treinar a Inteligência Artificial médica... (Isto só acontece uma vez)")
 def treinar_modelo_agora():
     try:
-        # Carregar a base de dados
         df = pd.read_csv('Obesity.csv')
-        
-        # Limpeza Inicial
         df.drop_duplicates(inplace=True)
         colunas_ruidosas = ['FCVC', 'NCP', 'CH2O', 'FAF', 'TUE']
         df[colunas_ruidosas] = df[colunas_ruidosas].round().astype(int)
         for col in df.select_dtypes(include=['object']).columns:
             df[col] = df[col].str.strip()
 
-        # Feature Engineering Biológico
         df['BMI'] = df['Weight'] / (df['Height'] ** 2)
         binarias = ['family_history', 'FAVC', 'SMOKE', 'SCC']
         for col in binarias:
@@ -35,35 +31,28 @@ def treinar_modelo_agora():
         df['CAEC'] = df['CAEC'].map(map_freq)
         df['CALC'] = df['CALC'].map(map_freq)
 
-        # Separação de Variáveis
         X = df.drop(columns=['Obesity'])
         y = df['Obesity']
 
         cat_cols = X.select_dtypes(include=['object']).columns.tolist()
         num_cols = [c for c in X.columns if c not in cat_cols]
 
-        # Pipeline idêntico ao nosso Megazord
         preprocess = ColumnTransformer([
             ('cat', OneHotEncoder(drop='first', handle_unknown='ignore'), cat_cols),
             ('num', StandardScaler(), num_cols)
         ])
         
         modelo_rf = RandomForestClassifier(n_estimators=500, random_state=42, n_jobs=-1, class_weight='balanced_subsample')
-        
         clf = Pipeline([('preprocess', preprocess), ('model', modelo_rf)])
-        
-        # O treino acontece aqui em 2 segundos
         clf.fit(X, y)
-        
         return clf
     except Exception as e:
         st.error(f"Erro ao ler os dados ou treinar o modelo: {e}")
         return None
 
-# Carrega o modelo recém-treinado
 modelo = treinar_modelo_agora()
 
-# Mapeamento do diagnóstico
+# Mapeamento do diagnóstico (De String para Nível e Texto amigável)
 dict_resultados = {
     'Insufficient_Weight': (0, 'Abaixo do Peso'),
     'Normal_Weight': (1, 'Peso Normal'),
@@ -74,7 +63,7 @@ dict_resultados = {
     'Obesity_Type_III': (6, 'Obesidade Tipo III')
 }
 
-# 3. Interface do Formulário 100% em Português
+# 3. Interface do Formulário Reformulada (Checkboxes e Listas Suspensas)
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -83,36 +72,54 @@ with col1:
     age = st.number_input("Idade (anos)", min_value=10, max_value=100, value=25)
     height = st.number_input("Altura (m)", min_value=1.0, max_value=2.5, value=1.70, step=0.01)
     weight = st.number_input("Peso (kg)", min_value=30.0, max_value=250.0, value=70.0, step=0.1)
-    family_history_pt = st.selectbox("Histórico familiar de excesso de peso?", ["Sim", "Não"])
+    
+    st.write("")
+    st.markdown("**Histórico familiar**")
+    family_history_pt = st.checkbox("Alguém na minha família tem ou já teve excesso de peso ou obesidade")
 
 with col2:
     st.subheader("Hábitos Alimentares")
-    favc_pt = st.selectbox("Consome alimentos calóricos com frequência?", ["Sim", "Não"])
+    st.markdown("**Alimentos calóricos**")
+    favc_pt = st.checkbox("Consumo de alimentos calóricos com frequência (fast-food, fritos, doces)")
+    
     fcvc = st.slider("Frequência de consumo de vegetais nas refeições (1 a 3)", 1, 3, 2)
     ncp = st.slider("Número de refeições principais por dia (1 a 4)", 1, 4, 3)
-    caec_pt = st.selectbox("Costuma comer entre as refeições?", ["Não", "Às vezes", "Frequentemente", "Sempre"])
-    scc_pt = st.selectbox("Monitora as calorias que ingere diariamente?", ["Sim", "Não"])
+    caec_pt = st.selectbox("Com que frequência você se alimenta entre as refeições principais?", ["Não", "Às vezes", "Frequentemente", "Sempre"])
+    
+    st.markdown("**Monitoramento de calorias**")
+    scc_pt = st.checkbox("Monitoro minha ingestão diária de calorias")
+    
+    ch2o_pt = st.selectbox("Consumo diário de água", [
+        "Menos de 1 litro por dia", 
+        "De 1 a 2 litros por dia", 
+        "Mais de 2 litros por dia"
+    ], index=1)
 
 with col3:
     st.subheader("Estilo de Vida")
-    smoke_pt = st.selectbox("O paciente é fumante?", ["Sim", "Não"])
-    ch2o = st.slider("Consumo diário de água (litros de 1 a 3)", 1, 3, 2)
-    faf = st.slider("Frequência de atividade física (dias por semana de 0 a 3)", 0, 3, 1)
-    tue = st.slider("Tempo diário de uso de telas (escala de 0 a 2)", 0, 2, 1)
+    st.markdown("**Tabagismo**")
+    smoke_pt = st.checkbox("O paciente possui o hábito de fumar")
+    
+    faf_pt = st.selectbox("Com que frequência você pratica alguma atividade física?", [
+        "Nenhuma vez", 
+        "1-2 vezes por semana", 
+        "3-4 vezes por semana", 
+        "5 vezes ou mais por semana"
+    ], index=1)
+    
+    tue = st.slider("Tempo diário de uso de telas/dispositivos eletrônicos (escala de 0 a 2)", 0, 2, 1)
     calc_pt = st.selectbox("Frequência de consumo de álcool?", ["Não", "Às vezes", "Frequentemente", "Sempre"])
-    mtrans_pt = st.selectbox("Meio de transporte utilizado", ["Transporte Público", "Automóvel", "Caminhada", "Motocicleta", "Bicicleta"])
+    mtrans_pt = st.selectbox("Qual o seu meio de transporte mais utilizado?", ["Transporte Público", "Automóvel", "Caminhada", "Motocicleta", "Bicicleta"])
 
 st.divider()
 
-# 4. Processamento Preditivo
+# 4. Processamento Preditivo e Conversões
 if st.button("🧠 Gerar Diagnóstico", type="primary"):
     
     if modelo is None:
-        st.error("O modelo não conseguiu treinar. Verifique se o ficheiro Obesity.csv está no GitHub.")
+        st.error("O modelo não conseguiu treinar. Verifique se o arquivo Obesity.csv está no GitHub.")
     else:
-        # Dicionários de conversão
         map_genero = {"Feminino": "Female", "Masculino": "Male"}
-        map_sim_nao = {"Sim": 1, "Não": 0}
         map_freq = {"Não": 0, "Às vezes": 1, "Frequentemente": 2, "Sempre": 3}
         map_transporte = {
             "Transporte Público": "Public_Transportation", 
@@ -122,31 +129,43 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
             "Bicicleta": "Bike"
         }
         
+        # Mapeamentos internos das novas listas suspensas para os valores matemáticos correspondentes
+        map_agua = {
+            "Menos de 1 litro por dia": 1,
+            "De 1 a 2 litros por dia": 2,
+            "Mais de 2 litros por dia": 3
+        }
+        
+        map_atividade = {
+            "Nenhuma vez": 0,
+            "1-2 vezes por semana": 1,
+            "3-4 vezes por semana": 2,
+            "5 vezes ou mais por semana": 3
+        }
+        
+        # Montagem da estrutura convertendo os booleanos (True/False) dos checkboxes para 1/0
         dados = {
             'Gender': map_genero[gender_pt],
             'Age': age,
             'Height': height,
             'Weight': weight,
-            'family_history': map_sim_nao[family_history_pt],
-            'FAVC': map_sim_nao[favc_pt],
+            'family_history': 1 if family_history_pt else 0,
+            'FAVC': 1 if favc_pt else 0,
             'FCVC': fcvc,
             'NCP': ncp,
             'CAEC': map_freq[caec_pt],
-            'SMOKE': map_sim_nao[smoke_pt],
-            'CH2O': ch2o,
-            'SCC': map_sim_nao[scc_pt],
-            'FAF': faf,
+            'SMOKE': 1 if smoke_pt else 0,
+            'CH2O': map_agua[ch2o_pt],
+            'SCC': 1 if scc_pt else 0,
+            'FAF': map_atividade[faf_pt],
             'TUE': tue,
             'CALC': map_freq[calc_pt],
             'MTRANS': map_transporte[mtrans_pt]
         }
         
         df_input = pd.DataFrame([dados])
-
-        # Criação do IMC
         df_input['BMI'] = df_input['Weight'] / (df_input['Height'] ** 2)
 
-        # Ordem das colunas
         ordem_colunas = [
             'Gender', 'Age', 'Height', 'Weight', 'family_history', 'FAVC', 
             'FCVC', 'NCP', 'CAEC', 'SMOKE', 'CH2O', 'SCC', 'FAF', 'TUE', 
@@ -154,7 +173,6 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
         ]
         df_input = df_input[ordem_colunas]
 
-        # Execução
         try:
             predicao_bruta = modelo.predict(df_input)[0] 
             grau, resultado_legivel = dict_resultados.get(predicao_bruta, (1, 'Peso Normal'))
@@ -162,14 +180,17 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
             st.success("Análise concluída com sucesso!")
             c1, c2 = st.columns(2)
             c1.metric("IMC Calculado", f"{df_input['BMI'].iloc[0]:.2f} kg/m²")
-            c2.metric("Diagnóstico do Algoritmo", resultado_legivel)
+            c2.metric("Diagnóstico do Algoritmo", resultado_traduzido if 'resultado_traduzido' in locals() else resultado_legivel)
             
+            # Lógica de Alertas Clínicos com a inclusão de Baixo Peso
             if grau >= 4:
-                st.error("🚨 Alerta Clínico: Estágio de Obesidade. Recomenda-se acompanhamento médico.")
+                st.error("🚨 Alerta Clínico: Estágio de Obesidade. Recomenda-se acompanhamento médico imediato.")
             elif grau >= 2:
-                st.warning("⚠️ Atenção Preventiva: Faixa de Sobrepeso. Recomendado monitoramento.")
-            else:
-                st.success("✅ Paciente apresenta índices dentro dos padrões normais.")
+                st.warning("⚠️ Atenção Preventiva: Faixa de Sobrepeso. Recomendado monitoramento da saúde.")
+            elif grau == 1:
+                st.success("✅ Paciente apresenta índices dentro dos padrões de normalidade clínica.")
+            elif grau == 0:
+                st.warning("⚠️ Alerta Clínico: Paciente abaixo do peso saudável. Recomenda-se avaliação nutricional e clínica especializada.")
                 
         except Exception as e:
             st.error(f"Erro na execução preditiva: {e}")
