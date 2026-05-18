@@ -100,7 +100,8 @@ with col3:
     st.subheader("Estilo de Vida")
     st.markdown("**Tabagismo**")
     smoke_pt = st.checkbox("Possui o hábito de fumar?")
-    
+    st.markdown("**Tecnologia e Outros**")
+    tue = st.slider("Tempo diário de uso de telas/dispositivos (escala de 0 a 2)", 0, 2, 1)    
     faf_pt = st.selectbox("Com que frequência você pratica alguma atividade física?", [
         "Nenhuma vez", 
         "1-2 vezes por semana", 
