@@ -233,7 +233,7 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
                 st.warning("👴 Em pacientes idosos sedentários, um IMC considerado 'normal' ou 'baixo' pode mascarar a perda severa de massa muscular substituída por tecido adiposo. Recomenda-se avaliar força e mobilidade de forma preventiva.")
 
             else:
-                st.markdown("")
+                st.success("n/a")
                 
         except Exception as e:
             st.error(f"Erro na execução preditiva: {e}")
