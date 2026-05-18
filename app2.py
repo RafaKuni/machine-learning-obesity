@@ -75,21 +75,21 @@ with col1:
     
     st.write("")
     st.markdown("**Histórico familiar**")
-    family_history_pt = st.checkbox("Alguém na minha família tem ou já teve excesso de peso ou obesidade")
+    family_history_pt = st.checkbox("Alguém na minha família tem ou já teve excesso de peso ou obesidade?")
 
 with col2:
     st.subheader("Hábitos Alimentares")
     st.markdown("**Alimentos calóricos**")
-    favc_pt = st.checkbox("Consumo de alimentos calóricos com frequência (fast-food, fritos, doces)")
+    favc_pt = st.checkbox("Consome alimentos calóricos com frequência (fast-food, fritos, doces)?")
     
-    fcvc = st.slider("Frequência de consumo de vegetais nas refeições (1 a 3)", 1, 3, 2)
+    fcvc = st.slider("Qual sua frequência de consumo de vegetais nas refeições (1 a 3)", 1, 3, 2)
     ncp = st.slider("Número de refeições principais por dia (1 a 4)", 1, 4, 3)
     caec_pt = st.selectbox("Com que frequência você se alimenta entre as refeições principais?", ["Não", "Às vezes", "Frequentemente", "Sempre"])
     
     st.markdown("**Monitoramento de calorias**")
-    scc_pt = st.checkbox("Monitoro minha ingestão diária de calorias")
+    scc_pt = st.checkbox("Monitora sua ingestão diária de calorias?")
     
-    ch2o_pt = st.selectbox("Consumo diário de água", [
+    ch2o_pt = st.selectbox("Qual seu consumo diário de água?", [
         "Menos de 1 litro por dia", 
         "De 1 a 2 litros por dia", 
         "Mais de 2 litros por dia"
@@ -98,7 +98,7 @@ with col2:
 with col3:
     st.subheader("Estilo de Vida")
     st.markdown("**Tabagismo**")
-    smoke_pt = st.checkbox("O paciente possui o hábito de fumar")
+    smoke_pt = st.checkbox("Possui o hábito de fumar?")
     
     faf_pt = st.selectbox("Com que frequência você pratica alguma atividade física?", [
         "Nenhuma vez", 
@@ -107,7 +107,7 @@ with col3:
         "5 vezes ou mais por semana"
     ], index=1)
     
-    tue = st.slider("Tempo diário de uso de telas/dispositivos eletrônicos (escala de 0 a 2)", 0, 2, 1)
+    tue = st.slider("Qual tempo diário de uso de telas/dispositivos eletrônicos (escala de 0 a 2)", 0, 2, 1)
     calc_pt = st.selectbox("Frequência de consumo de álcool?", ["Não", "Às vezes", "Frequentemente", "Sempre"])
     mtrans_pt = st.selectbox("Qual o seu meio de transporte mais utilizado?", ["Transporte Público", "Automóvel", "Caminhada", "Motocicleta", "Bicicleta"])
 
