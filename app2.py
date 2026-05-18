@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 st.set_page_config(page_title="Predição de Obesidade", layout="wide", page_icon="🏥")
 
 st.title("🏥 Sistema de Triagem Preditiva de Obesidade")
+st.markdown("Rafael Kuniyoshi")
 st.markdown("Insira os dados clínicos e os hábitos do paciente para prever o nível de risco.")
 st.divider()
 
