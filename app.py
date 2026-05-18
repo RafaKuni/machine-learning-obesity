@@ -9,7 +9,8 @@ from sklearn.ensemble import RandomForestClassifier
 st.set_page_config(page_title="Predição de Obesidade", layout="wide", page_icon="🏥")
 
 st.title("🏥 Sistema de Triagem Preditiva de Obesidade")
-st.markdown("Insira os dados clínicos e os hábitos do paciente para prever o nível de risco metabólico e receber insights heurísticos.")
+st.markdown("Insira os dados clínicos e os hábitos do paciente para prever o nível de risco metabólico")
+st.markdown("by Rafael Kuniyoshi")
 st.divider()
 
 # 2. Treinamento do modelo acoplado na Nuvem
@@ -220,16 +221,16 @@ if st.button("🧠 Gerar Diagnóstico", type="primary"):
                 st.markdown("### 🔍 Insights Contextuais do Paciente")
                 
             if is_atleta and grau >= 2:
-                st.info("💪 **Perfil Atlético Detectado:** O modelo aponta excesso de peso, mas a rotina intensa de exercícios sugere alta probabilidade de peso concentrado em massa muscular. O cálculo de IMC tradicional pode ser impreciso neste cenário. Recomenda-se exame de bioimpedância.")
+                st.info("💪 O modelo aponta excesso de peso, mas a rotina intensa de exercícios sugere alta probabilidade de peso concentrado em massa muscular. O cálculo de IMC tradicional pode ser impreciso neste cenário. Recomenda-se exame de bioimpedância.")
                 
             if is_falso_magro:
-                st.error("🕵️ **Alerta de Falso Magro (Risco Oculto):** Embora o peso geral esteja normal, o alto sedentarismo combinado à má alimentação indica um forte risco de acúmulo de gordura visceral e síndrome metabólica.")
+                st.error("🕵️ Embora o peso geral esteja normal, o alto sedentarismo combinado à má alimentação indica um forte risco de acúmulo de gordura visceral e síndrome metabólica.")
                 
             if is_adolescente:
-                st.warning("👶 **Aviso Pediátrico:** O paciente é menor de 18 anos. As predições baseadas em IMC de adultos devem ser analisadas com cautela. O diagnóstico oficial deve utilizar as Curvas de Percentil da OMS.")
+                st.warning("👶 O paciente é menor de 18 anos. As predições baseadas em IMC de adultos devem ser analisadas com cautela. O diagnóstico oficial deve utilizar as Curvas de Percentil da OMS.")
                 
             if is_idoso_sedentario and grau <= 2:
-                st.warning("👴 **Alerta Geriátrico (Risco de Sarcopenia):** Em pacientes idosos sedentários, um IMC considerado 'normal' ou 'baixo' pode mascarar a perda severa de massa muscular substituída por tecido adiposo. Recomenda-se avaliar força e mobilidade de forma preventiva.")
+                st.warning("👴 Em pacientes idosos sedentários, um IMC considerado 'normal' ou 'baixo' pode mascarar a perda severa de massa muscular substituída por tecido adiposo. Recomenda-se avaliar força e mobilidade de forma preventiva.")
                 
         except Exception as e:
             st.error(f"Erro na execução preditiva: {e}")
