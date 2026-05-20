@@ -1,57 +1,43 @@
 import streamlit as st
 import pandas as pd
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
+import joblib
 
 # 1. Configuração da página
 st.set_page_config(page_title="Predição de Obesidade", layout="wide", page_icon="🏥")
 
 st.title("🏥 Sistema de Triagem Preditiva de Obesidade")
 st.markdown("Insira os dados clínicos e os hábitos do paciente para prever o nível de risco metabólico")
-st.markdown("by Rafael Kuniyoshi")
+st.markdown("**by Rafael Kuniyoshi**")
 st.divider()
 
-# 2. Treinamento do modelo acoplado na Nuvem
-@st.cache_resource(show_spinner="A treinar a Inteligência Artificial médica... (Isto só acontece uma vez)")
-def treinar_modelo_agora():
+# ==========================================
+# INTEGRAÇÃO COM POWER BI
+# ==========================================
+st.subheader("📊 Painel Analítico de Negócios")
+# Substitua o link abaixo pelo link gerado no seu Power BI (Publicar na Web)
+link_power_bi = "https://app.powerbi.com/view?r=SEU_LINK_AQUI" 
+
+embed = f'''
+<iframe title="Dashboard Obesidade" width="100%" height="600" src="{link_power_bi}" frameborder="0" allowFullScreen="true"></iframe>
+'''
+st.components.v1.html(embed, height=600)
+st.divider()
+
+# ==========================================
+# SISTEMA DE PREDIÇÃO (MACHINE LEARNING)
+# ==========================================
+st.subheader("🩺 Formulário de Triagem Clínica")
+
+# 2. Carregamento do Modelo Salvo (Leve e Rápido)
+@st.cache_resource(show_spinner="Carregando a Inteligência Artificial...")
+def carregar_modelo():
     try:
-        df = pd.read_csv('Obesity.csv')
-        df.drop_duplicates(inplace=True)
-        colunas_ruidosas = ['FCVC', 'NCP', 'CH2O', 'FAF', 'TUE']
-        df[colunas_ruidosas] = df[colunas_ruidosas].round().astype(int)
-        for col in df.select_dtypes(include=['object']).columns:
-            df[col] = df[col].str.strip()
-
-        df['BMI'] = df['Weight'] / (df['Height'] ** 2)
-        binarias = ['family_history', 'FAVC', 'SMOKE', 'SCC']
-        for col in binarias:
-            df[col] = df[col].map({'no': 0, 'yes': 1})
-        map_freq = {'no': 0, 'Sometimes': 1, 'Frequently': 2, 'Always': 3}
-        df['CAEC'] = df['CAEC'].map(map_freq)
-        df['CALC'] = df['CALC'].map(map_freq)
-
-        X = df.drop(columns=['Obesity'])
-        y = df['Obesity']
-
-        cat_cols = X.select_dtypes(include=['object']).columns.tolist()
-        num_cols = [c for c in X.columns if c not in cat_cols]
-
-        preprocess = ColumnTransformer([
-            ('cat', OneHotEncoder(drop='first', handle_unknown='ignore'), cat_cols),
-            ('num', StandardScaler(), num_cols)
-        ])
-        
-        modelo_rf = RandomForestClassifier(n_estimators=500, random_state=42, n_jobs=-1, class_weight='balanced_subsample')
-        clf = Pipeline([('preprocess', preprocess), ('model', modelo_rf)])
-        clf.fit(X, y)
-        return clf
+        return joblib.load('modelo_obesidade_campeao.joblib')
     except Exception as e:
-        st.error(f"Erro ao ler os dados ou treinar o modelo: {e}")
+        st.error(f"Erro ao carregar o modelo. Verifique se o arquivo .joblib está no GitHub. Detalhes: {e}")
         return None
 
-modelo = treinar_modelo_agora()
+modelo = carregar_modelo()
 
 # Mapeamento do diagnóstico
 dict_resultados = {
@@ -64,11 +50,11 @@ dict_resultados = {
     'Obesity_Type_III': (6, 'Obesidade Tipo III')
 }
 
-# 3. Interface do Formulário Reformulada
+# 3. Interface do Formulário Reformulada (3 Colunas)
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.subheader("Físico e Genética")
+    st.markdown("#### Físico e Genética")
     gender_pt = st.selectbox("Gênero biológico", ["Feminino", "Masculino"])
     age = st.number_input("Idade (anos)", min_value=10, max_value=100, value=25)
     height = st.number_input("Altura (m)", min_value=1.0, max_value=2.5, value=1.70, step=0.01)
@@ -79,7 +65,7 @@ with col1:
     family_history_pt = st.checkbox("Alguém na minha família tem ou já teve excesso de peso ou obesidade")
 
 with col2:
-    st.subheader("Hábitos Alimentares")
+    st.markdown("#### Hábitos Alimentares")
     st.markdown("**Alimentos calóricos e Vegetais**")
     favc_pt = st.checkbox("Consumo de alimentos calóricos com frequência (fast-food, fritos, doces)")
     
@@ -102,7 +88,7 @@ with col2:
     ], index=1)
 
 with col3:
-    st.subheader("Estilo de Vida")
+    st.markdown("#### Estilo de Vida")
     st.markdown("**Tabagismo e Exercício**")
     smoke_pt = st.checkbox("O paciente possui o hábito de fumar")
     
@@ -124,7 +110,7 @@ st.divider()
 if st.button("🧠 Gerar Diagnóstico", type="primary"):
     
     if modelo is None:
-        st.error("O modelo não conseguiu treinar. Verifique se o ficheiro Obesity.csv está no GitHub.")
+        st.error("O modelo não pôde ser carregado. Tente recarregar a página.")
     else:
         # Dicionários de conversão interna
         map_genero = {"Feminino": "Female", "Masculino": "Male"}
