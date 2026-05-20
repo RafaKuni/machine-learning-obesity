@@ -2,32 +2,23 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# ==========================================
-# 1. CONFIGURAÇÃO DA PÁGINA
-# ==========================================
 st.set_page_config(page_title="Predição de Obesidade", layout="centered", page_icon="🏥")
 
 st.title("🏥 Classificador de Obesidade")
 st.markdown("Preencha os dados abaixo para verificar se o padrão indica risco de obesidade.")
 st.divider()
 
-# ==========================================
-# 2. CARREGAMENTO DO MODELO (CACHE)
-# ==========================================
 @st.cache_resource(show_spinner="Carregando Inteligência Artificial...")
 def carregar_modelo():
     try:
-        # Carrega o modelo treinado (certifique-se de que o arquivo .joblib está no GitHub)
-        return joblib.load('modelo_obesidade_campeao.joblib')
+        # Carrega o modelo vencedor gerado na batalha de modelos (.pkl)
+        return joblib.load('modelo_obesidade.pkl')
     except Exception as e:
         st.error(f"Erro ao carregar o modelo. Detalhes: {e}")
         return None
 
 modelo = carregar_modelo()
 
-# ==========================================
-# 3. INTERFACE DO FORMULÁRIO (2 COLUNAS)
-# ==========================================
 col1, col2 = st.columns(2)
 
 with col1:
@@ -52,14 +43,9 @@ with col2:
 
 st.divider()
 
-# ==========================================
-# 4. PROCESSAMENTO E PREDIÇÃO
-# ==========================================
-# Utilizando width="stretch" atualizado para as novas versões do Streamlit
 if st.button("Analisar Paciente", type="primary", width="stretch"):
     if modelo is not None:
         
-        # Dicionários de Tradução para o formato que a IA entende
         map_genero = {"Feminino": "Female", "Masculino": "Male"}
         map_freq = {"Não": 0, "Às vezes": 1, "Frequentemente": 2, "Sempre": 3}
         map_transporte = {"Transporte Público": "Public_Transportation", "Automóvel": "Automobile", "Caminhada": "Walking", "Motocicleta": "Motorbike", "Bicicleta": "Bike"}
@@ -67,7 +53,6 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
         map_atividade = {"Nenhuma": 0, "1-2 vezes na semana": 1, "3-4 vezes na semana": 2, "5+ vezes na semana": 3}
         map_vegetais = {"Raramente ou nunca": 1, "Em algumas refeições": 2, "Em todas as refeições": 3}
         
-        # Montagem do Dicionário de Dados
         dados = {
             'Gender': map_genero[gender_pt], 
             'Age': age, 
@@ -87,11 +72,9 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
             'MTRANS': map_transporte[mtrans_pt]
         }
         
-        # Criação do DataFrame e Feature Engineering do IMC
         df_input = pd.DataFrame([dados])
         df_input['BMI'] = df_input['Weight'] / (df_input['Height'] ** 2)
         
-        # Ordenação exata das colunas exigida pelo modelo
         ordem_colunas = [
             'Gender', 'Age', 'Height', 'Weight', 'family_history', 'FAVC', 
             'FCVC', 'NCP', 'CAEC', 'SMOKE', 'CH2O', 'SCC', 'FAF', 'TUE', 
@@ -103,10 +86,10 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
             predicao_bruta = modelo.predict(df_input)[0] 
             categorias_obesidade = ['Obesity_Type_I', 'Obesity_Type_II', 'Obesity_Type_III']
             
-            # Pegando o valor exato do IMC que o nosso código calculou nos bastidores
             imc_calculado = df_input['BMI'].iloc[0]
             
-            st.write("")
+            st.write("") # Espaçamento visual
+            
             if predicao_bruta in categorias_obesidade:
                 st.error("### 🚨 Resultado: POSITIVO para Obesidade")
                 st.write("O padrão de dados inserido indica quadro de obesidade.")
@@ -114,13 +97,8 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
                 st.success("### ✅ Resultado: NEGATIVO para Obesidade")
                 st.write("O padrão de dados inserido indica peso normal, abaixo do peso ou leve sobrepeso.")
             
-            # O novo alerta de IMC aparecendo logo abaixo do bloco verde/vermelho
+            # Alerta informativo com o valor real do IMC para apoio de UX clínico
             st.info(f"ℹ️ **Informação Clínica:** O IMC calculado do paciente é de **{imc_calculado:.2f} kg/m²**.")
             
-        except Exception as e:
-            st.error(f"Erro interno na predição: {e}")
-
-        
-                
         except Exception as e:
             st.error(f"Erro interno na predição. Detalhes: {e}")
