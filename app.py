@@ -100,21 +100,27 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
         df_input = df_input[ordem_colunas]
 
         try:
-            # Realiza a predição
             predicao_bruta = modelo.predict(df_input)[0] 
-            
-            # Categorias que representam obesidade no dataset original
             categorias_obesidade = ['Obesity_Type_I', 'Obesity_Type_II', 'Obesity_Type_III']
             
-            st.write("") # Espaçamento
+            # Pegando o valor exato do IMC que o nosso código calculou nos bastidores
+            imc_calculado = df_input['BMI'].iloc[0]
             
-            # Exibe o veredito final
+            st.write("")
             if predicao_bruta in categorias_obesidade:
                 st.error("### 🚨 Resultado: POSITIVO para Obesidade")
-                st.write("O padrão de dados inserido indica quadro de obesidade. Recomenda-se avaliação clínica detalhada.")
+                st.write("O padrão de dados inserido indica quadro de obesidade.")
             else:
                 st.success("### ✅ Resultado: NEGATIVO para Obesidade")
                 st.write("O padrão de dados inserido indica peso normal, abaixo do peso ou leve sobrepeso.")
+            
+            # O novo alerta de IMC aparecendo logo abaixo do bloco verde/vermelho
+            st.info(f"ℹ️ **Informação Clínica:** O IMC calculado do paciente é de **{imc_calculado:.2f} kg/m²**.")
+            
+        except Exception as e:
+            st.error(f"Erro interno na predição: {e}")
+
+        
                 
         except Exception as e:
             st.error(f"Erro interno na predição. Detalhes: {e}")
