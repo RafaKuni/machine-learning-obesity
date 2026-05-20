@@ -10,25 +10,7 @@ st.markdown("Insira os dados clínicos e os hábitos do paciente para prever o n
 st.markdown("**by Rafael Kuniyoshi**")
 st.divider()
 
-# ==========================================
-# INTEGRAÇÃO COM POWER BI
-# ==========================================
-st.subheader("📊 Painel Analítico de Negócios")
-# Substitua o link abaixo pelo link gerado no seu Power BI (Publicar na Web)
-link_power_bi = "https://app.powerbi.com/view?r=SEU_LINK_AQUI" 
-
-embed = f'''
-<iframe title="Dashboard Obesidade" width="100%" height="600" src="{link_power_bi}" frameborder="0" allowFullScreen="true"></iframe>
-'''
-st.components.v1.html(embed, height=600)
-st.divider()
-
-# ==========================================
-# SISTEMA DE PREDIÇÃO (MACHINE LEARNING)
-# ==========================================
-st.subheader("🩺 Formulário de Triagem Clínica")
-
-# 2. Carregamento do Modelo Salvo (Leve e Rápido)
+# 2. Carregamento do Modelo Salvo 
 @st.cache_resource(show_spinner="Carregando a Inteligência Artificial...")
 def carregar_modelo():
     try:
