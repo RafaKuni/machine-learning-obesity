@@ -5,7 +5,7 @@ import joblib
 st.set_page_config(page_title="Predição de Obesidade", layout="centered", page_icon="🏥")
 
 st.title("🏥 Classificador de Obesidade")
-st.markdown("Preencha os dados abaixo para verificar se o padrão indica risco de obesidade.")
+st.markdown("Preencha os dados abaixo para verificar o padrão de risco do paciente.")
 st.divider()
 
 @st.cache_resource(show_spinner="Carregando Inteligência Artificial...")
@@ -43,7 +43,8 @@ with col2:
 
 st.divider()
 
-if st.button("Analisar Paciente", type="primary", width="stretch"):
+# Botão atualizado com 'use_container_width' para ocupar a tela de forma responsiva
+if st.button("Analisar Paciente", type="primary", use_container_width=True):
     if modelo is not None:
         
         map_genero = {"Feminino": "Female", "Masculino": "Male"}
@@ -73,8 +74,11 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
         }
         
         df_input = pd.DataFrame([dados])
+        
+        # Criando a feature BMI que o modelo exige
         df_input['BMI'] = df_input['Weight'] / (df_input['Height'] ** 2)
         
+        # Organizando a ordem idêntica ao dataset de treino
         ordem_colunas = [
             'Gender', 'Age', 'Height', 'Weight', 'family_history', 'FAVC', 
             'FCVC', 'NCP', 'CAEC', 'SMOKE', 'CH2O', 'SCC', 'FAF', 'TUE', 
@@ -84,21 +88,26 @@ if st.button("Analisar Paciente", type="primary", width="stretch"):
 
         try:
             predicao_bruta = modelo.predict(df_input)[0] 
-            categorias_obesidade = ['Obesity_Type_I', 'Obesity_Type_II', 'Obesity_Type_III']
-            
             imc_calculado = df_input['BMI'].iloc[0]
+            
+            # Dicionário para traduzir a saída do modelo para o usuário
+            map_resultado = {
+                'Insufficient_Weight': 'Abaixo do Peso',
+                'Normal_Weight': 'Peso Normal',
+                'Overweight_Level_I': 'Sobrepeso Grau I',
+                'Overweight_Level_II': 'Sobrepeso Grau II',
+                'Obesity_Type_I': 'Obesidade Grau I',
+                'Obesity_Type_II': 'Obesidade Grau II',
+                'Obesity_Type_III': 'Obesidade Grau III'
+            }
+            
+            resultado_traduzido = map_resultado.get(predicao_bruta, predicao_bruta)
             
             st.write("") # Espaçamento visual
             
-            if predicao_bruta in categorias_obesidade:
-                st.error("### 🚨 Resultado: POSITIVO para Obesidade")
-                st.write("O padrão de dados inserido indica quadro de obesidade.")
-            else:
-                st.success("### ✅ Resultado: NEGATIVO para Obesidade")
-                st.write("O padrão de dados inserido indica peso normal, abaixo do peso ou leve sobrepeso.")
-            
-            # Alerta informativo com o valor real do IMC para apoio de UX clínico
-            st.info(f"ℹ️ **Informação Clínica:** O IMC calculado do paciente é de **{imc_calculado:.2f} kg/m²**.")
+            # Exibe o resultado direto
+            st.markdown(f"### 🎯 Classificação do Paciente: **{resultado_traduzido}**")
+            st.info(f"ℹ️ O IMC calculado é de **{imc_calculado:.2f} kg/m²**.")
             
         except Exception as e:
             st.error(f"Erro interno na predição. Detalhes: {e}")
