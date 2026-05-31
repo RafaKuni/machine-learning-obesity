@@ -107,7 +107,7 @@ if st.button("Analisar Paciente", type="primary", use_container_width=True):
             
             # Exibe o resultado direto
             st.markdown(f"### 🎯 Classificação do Paciente: **{resultado_traduzido}**")
-            st.info(f"ℹ️ O IMC calculado é de **{imc_calculado:.2f} kg/m²**.")
+            st.info(f"ℹ️ O IMC calculado é de **{str(round(imc_calculado, 2)).replace('.', ',')} kg/m²**.")
             
         except Exception as e:
             st.error(f"Erro interno na predição. Detalhes: {e}")
