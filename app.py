@@ -76,7 +76,7 @@ if st.button("Analisar Paciente", type="primary", use_container_width=True):
         df_input = pd.DataFrame([dados])
         
         # Criando a feature BMI que o modelo exige
-        df_input['BMI'] = df_input['Weight'] / (df_input['Height'] ** 2)
+        df_input['BMI'] = df_input['Weight'] / (df_input['Height'] * df_input['Height'])
         
         # Organizando a ordem idêntica ao dataset de treino
         ordem_colunas = [
